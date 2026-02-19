@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id            String           @id @default(cuid())
+  title         String
+  description   String
+  thumbnail     String
+  gameUrl       String
+  genre         Genre            @relation(fields: [genreId], references: [id])
+  genreId       String
+  aiTool        AiTool           @relation(fields: [aiToolId], references: [id])
+  aiToolId      String
+  ratings       Rating[]
+  dailyStats    DailyGameStats[]
+  todayPicks    TodaySelection[]
+  averageRating Float            @default(0)
+  totalPlayers  Int              @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model Genre {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  games Game[]
+}
+
+model AiTool {
+  id    String  @id @default(cuid())
+  name  String  @unique
+  slug  String  @unique
+  icon  String?
+  games Game[]
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  score     Int
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String
+  sessionId String
+  createdAt DateTime @default(now())
+
+  @@unique([gameId, sessionId])
+}
+
+model DailyGameStats {
+  id          String   @id @default(cuid())
+  game        Game     @relation(fields: [gameId], references: [id])
+  gameId      String
+  date        DateTime
+  playerCount Int      @default(0)
+
+  @@unique([gameId, date])
+}
+
+model TodaySelection {
+  id     String   @id @default(cuid())
+  game   Game     @relation(fields: [gameId], references: [id])
+  gameId String
+  date   DateTime
+  order  Int
+
+  @@unique([gameId, date])
+}
+
+model Ad {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  linkUrl   String
+  position  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model GameSubmission {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  gameUrl       String
+  genreName     String
+  aiToolName    String
+  submitterName String
+  submitterEmail String
+  status        String   @default("pending") // "pending" | "approved" | "rejected"
+  adminNote     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

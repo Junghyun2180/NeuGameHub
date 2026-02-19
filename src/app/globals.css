@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  /* Steam-style dark theme colors */
+  --color-steam-dark: #171a21;
+  --color-steam-bg: #1b2838;
+  --color-steam-card: #213040;
+  --color-steam-card-hover: #2a475e;
+  --color-steam-blue: #66c0f4;
+  --color-steam-blue-dark: #417a9b;
+  --color-steam-green: #4c6b22;
+  --color-steam-text: #c7d5e0;
+  --color-steam-text-muted: #8f98a0;
+  --color-steam-border: #2a475e;
+  --color-steam-highlight: #67c1f5;
+
+  /* Brand colors */
+  --color-brand: #66c0f4;
+  --color-brand-hover: #8ad3f7;
+
+  /* Rating star */
+  --color-star: #fbbf24;
+  --color-star-empty: #4a5568;
+}
+
+/* Base styles */
+body {
+  background-color: var(--color-steam-dark);
+  color: var(--color-steam-text);
+  font-family: "Arial", "Helvetica", sans-serif;
+}
+
+/* Scrollbar styling for the dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-steam-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-steam-card-hover);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-steam-blue-dark);
+}
+
+/* Utility classes for horizontal scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
