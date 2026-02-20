@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { hashPassword } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 export async function POST() {
@@ -7,6 +8,8 @@ export async function POST() {
   }
 
   // Clear existing data
+  await prisma.session.deleteMany();
+  await prisma.user.deleteMany();
   await prisma.todaySelection.deleteMany();
   await prisma.dailyGameStats.deleteMany();
   await prisma.rating.deleteMany();
@@ -14,6 +17,17 @@ export async function POST() {
   await prisma.genre.deleteMany();
   await prisma.aiTool.deleteMany();
   await prisma.ad.deleteMany();
+
+  // Create admin user
+  const adminPassword = await hashPassword("admin123");
+  await prisma.user.create({
+    data: {
+      email: "admin@neugamehub.com",
+      username: "admin",
+      password: adminPassword,
+      role: "admin",
+    },
+  });
 
   // Create genres
   const genres = await Promise.all([
@@ -105,6 +119,7 @@ export async function POST() {
 
   return NextResponse.json({
     message: "Seed completed",
+    admin: "admin@neugamehub.com / admin123",
     genres: genres.length,
     aiTools: aiTools.length,
     games: gamesData.length,

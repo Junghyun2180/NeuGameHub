@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Logo from "@/components/Logo";
+import UserMenu from "@/components/layout/UserMenu";
+import { getCurrentUser } from "@/lib/auth";
 
 async function getNavData() {
   const [genres, aiTools] = await Promise.all([
@@ -12,6 +14,7 @@ async function getNavData() {
 
 export default async function Header() {
   const { genres, aiTools } = await getNavData();
+  const user = await getCurrentUser();
 
   return (
     <header className="sticky top-0 z-50 bg-steam-dark border-b border-steam-border/50 shadow-lg shadow-black/20">
@@ -155,6 +158,20 @@ export default async function Header() {
             </div>
           </form>
 
+          {/* User area - Desktop */}
+          <div className="hidden md:flex items-center ml-3">
+            {user ? (
+              <UserMenu username={user.username} role={user.role} />
+            ) : (
+              <Link
+                href="/login"
+                className="px-3 py-1.5 text-sm bg-steam-blue hover:bg-steam-highlight text-steam-dark font-medium rounded transition-colors"
+              >
+                로그인
+              </Link>
+            )}
+          </div>
+
           {/* Mobile menu button */}
           <div className="md:hidden ml-3">
             <details className="relative">
@@ -174,6 +191,35 @@ export default async function Header() {
                 </svg>
               </summary>
               <div className="absolute right-0 top-full mt-1 bg-steam-card border border-steam-border rounded-lg shadow-xl shadow-black/40 py-2 min-w-[200px] z-50">
+                {/* Mobile user info */}
+                {user ? (
+                  <>
+                    <div className="px-4 py-2 text-sm text-steam-text font-medium border-b border-steam-border mb-1">
+                      {user.username}
+                      {user.role === "admin" && (
+                        <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-yellow-600/30 text-yellow-300 rounded font-medium">
+                          관리자
+                        </span>
+                      )}
+                    </div>
+                    {user.role === "admin" && (
+                      <Link
+                        href="/admin/submissions"
+                        className="block px-4 py-2 text-sm text-yellow-300 hover:text-yellow-200 hover:bg-steam-card-hover transition-colors"
+                      >
+                        게임 등록 관리
+                      </Link>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="block px-4 py-2 text-sm text-steam-blue hover:text-steam-highlight hover:bg-steam-card-hover transition-colors font-medium"
+                  >
+                    로그인
+                  </Link>
+                )}
+                <div className="border-t border-steam-border my-1" />
                 <div className="px-4 py-2 text-xs text-steam-text-muted uppercase tracking-wider font-semibold">
                   장르
                 </div>

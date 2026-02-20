@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
@@ -6,6 +7,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireAdmin();
+
     const { id } = await params;
     const body = await request.json();
     const { action, adminNote } = body;
@@ -78,6 +81,9 @@ export async function PATCH(
 
     return NextResponse.json({ message: "게임 등록이 거절되었습니다" });
   } catch (error) {
+    if (error instanceof Error && error.message === "관리자 권한이 필요합니다") {
+      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+    }
     console.error("Failed to process submission:", error);
     return NextResponse.json(
       { error: "처리에 실패했습니다" },
