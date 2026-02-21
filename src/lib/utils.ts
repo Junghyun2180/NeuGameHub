@@ -13,6 +13,15 @@ export function formatPlayerCount(count: number): string {
   return count.toString();
 }
 
+export function isValidGameUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export function getSessionId(): string {
   if (typeof window === "undefined") return "";
   let sessionId = localStorage.getItem("ngh_session_id");

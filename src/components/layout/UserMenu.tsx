@@ -37,6 +37,12 @@ export default function UserMenu({ username, role }: UserMenuProps) {
       </button>
       <div className="absolute top-full right-0 pt-1 invisible group-hover/user:visible opacity-0 group-hover/user:opacity-100 transition-all duration-150">
         <div className="bg-steam-card border border-steam-border rounded-lg shadow-xl shadow-black/40 py-2 min-w-[160px]">
+          <a
+            href="/mypage"
+            className="block px-4 py-2 text-sm text-steam-text-muted hover:text-steam-text hover:bg-steam-card-hover transition-colors"
+          >
+            마이페이지
+          </a>
           {role === "admin" && (
             <a
               href="/admin/submissions"

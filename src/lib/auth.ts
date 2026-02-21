@@ -25,7 +25,7 @@ export async function createSession(userId: string): Promise<string> {
   cookieStore.set(SESSION_COOKIE_NAME, session.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "strict",
     path: "/",
     expires: expiresAt,
   });
@@ -68,6 +68,18 @@ export async function getCurrentUser() {
     username: session.user.username,
     role: session.user.role,
   };
+}
+
+export async function getFavoriteGameIds(): Promise<string[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
+  const favorites = await prisma.favorite.findMany({
+    where: { userId: user.id },
+    select: { gameId: true },
+  });
+
+  return favorites.map((f) => f.gameId);
 }
 
 export async function requireAdmin() {

@@ -11,9 +11,10 @@ interface GameGridProps {
     aiTool: { name: string };
   }>;
   title?: string;
+  favoriteGameIds?: string[];
 }
 
-export default function GameGrid({ games, title }: GameGridProps) {
+export default function GameGrid({ games, title, favoriteGameIds }: GameGridProps) {
   if (games.length === 0) {
     return null;
   }
@@ -25,7 +26,7 @@ export default function GameGrid({ games, title }: GameGridProps) {
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {games.map((game) => (
-          <GameCard key={game.id} game={game} />
+          <GameCard key={game.id} game={game} favoriteGameIds={favoriteGameIds} />
         ))}
       </div>
     </section>

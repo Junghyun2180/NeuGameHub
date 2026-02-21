@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { getFavoriteGameIds } from "@/lib/auth";
 import GamePlaySection from "@/components/game/GamePlaySection";
 import GameCard from "@/components/game/GameCard";
+import FavoriteButton from "@/components/game/FavoriteButton";
 import Link from "next/link";
 
 const PLACEHOLDER_COLORS = [
@@ -73,6 +75,7 @@ export default async function GameDetailPage({
     },
   });
 
+  const favoriteGameIds = await getFavoriteGameIds();
   const gradient = getGradient(game.title);
 
   return (
@@ -91,9 +94,16 @@ export default async function GameDetailPage({
 
       {/* Title & Tags */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-steam-text mb-3">
-          {game.title}
-        </h1>
+        <div className="flex items-center gap-3 mb-3">
+          <h1 className="text-3xl font-bold text-steam-text">
+            {game.title}
+          </h1>
+          <FavoriteButton
+            gameId={game.id}
+            initialFavorite={favoriteGameIds.includes(game.id)}
+            size="md"
+          />
+        </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Link
             href={`/category/${game.genre.slug}`}
@@ -136,7 +146,7 @@ export default async function GameDetailPage({
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {relatedGames.map((g) => (
-              <GameCard key={g.id} game={g} />
+              <GameCard key={g.id} game={g} favoriteGameIds={favoriteGameIds} />
             ))}
           </div>
         </div>

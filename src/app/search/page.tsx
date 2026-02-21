@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getFavoriteGameIds } from "@/lib/auth";
 import GameGrid from "@/components/game/GameGrid";
 
 export const metadata = {
@@ -12,6 +13,7 @@ export default async function SearchPage({
 }) {
   const { q } = await searchParams;
   const query = q?.trim() || "";
+  const favoriteGameIds = await getFavoriteGameIds();
 
   const games = query
     ? await prisma.game.findMany({
@@ -49,7 +51,7 @@ export default async function SearchPage({
       </div>
 
       {games.length > 0 ? (
-        <GameGrid games={games} />
+        <GameGrid games={games} favoriteGameIds={favoriteGameIds} />
       ) : query ? (
         <div className="text-center py-16">
           <div className="text-steam-text-muted text-lg mb-2">

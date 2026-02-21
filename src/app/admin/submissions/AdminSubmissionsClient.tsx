@@ -122,6 +122,7 @@ export default function AdminSubmissionsClient() {
               <iframe
                 src={previewUrl}
                 className="w-full h-full"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; fullscreen"
                 allowFullScreen
               />

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { getFavoriteGameIds } from "@/lib/auth";
 import GameGrid from "@/components/game/GameGrid";
 
 export async function generateMetadata({
@@ -38,6 +39,8 @@ export default async function AiToolPage({
 
   if (!aiTool) notFound();
 
+  const favoriteGameIds = await getFavoriteGameIds();
+
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-6">
       <div className="mb-6">
@@ -48,7 +51,7 @@ export default async function AiToolPage({
           {aiTool.games.length}개의 게임
         </p>
       </div>
-      <GameGrid games={aiTool.games} />
+      <GameGrid games={aiTool.games} favoriteGameIds={favoriteGameIds} />
     </div>
   );
 }

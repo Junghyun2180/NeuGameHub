@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { isValidGameUrl } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
@@ -50,6 +51,13 @@ export async function PATCH(
             slug: submission.aiToolName.toLowerCase().replace(/\s+/g, "-"),
           },
         });
+      }
+
+      if (!isValidGameUrl(submission.gameUrl)) {
+        return NextResponse.json(
+          { error: "게임 URL이 유효하지 않습니다 (https:// 필수)" },
+          { status: 400 }
+        );
       }
 
       // Create the game

@@ -81,6 +81,7 @@ export default function GamePlaySection({
               src={gameUrl}
               title={gameTitle}
               className="w-full h-full"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
               allowFullScreen
             />

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getFavoriteGameIds } from "@/lib/auth";
 import GameGrid from "@/components/game/GameGrid";
 
 export const metadata = {
@@ -16,6 +17,8 @@ export default async function GamesPage({
   let orderBy: OrderBy = { totalPlayers: "desc" };
   if (sort === "rating") orderBy = { averageRating: "desc" };
   if (sort === "newest") orderBy = { createdAt: "desc" };
+
+  const favoriteGameIds = await getFavoriteGameIds();
 
   const games = await prisma.game.findMany({
     orderBy,
@@ -67,7 +70,7 @@ export default async function GamesPage({
           </a>
         </div>
       </div>
-      <GameGrid games={games} />
+      <GameGrid games={games} favoriteGameIds={favoriteGameIds} />
     </div>
   );
 }

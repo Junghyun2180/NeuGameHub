@@ -15,9 +15,10 @@ interface GenreRowProps {
     genre: { name: string };
     aiTool: { name: string };
   }>;
+  favoriteGameIds?: string[];
 }
 
-export default function GenreRow({ genre, games }: GenreRowProps) {
+export default function GenreRow({ genre, games, favoriteGameIds }: GenreRowProps) {
   if (games.length === 0) return null;
 
   return (
@@ -33,7 +34,7 @@ export default function GenreRow({ genre, games }: GenreRowProps) {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {games.map((game) => (
-          <GameCard key={game.id} game={game} />
+          <GameCard key={game.id} game={game} favoriteGameIds={favoriteGameIds} />
         ))}
       </div>
     </section>

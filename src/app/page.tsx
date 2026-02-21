@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getToday } from "@/lib/utils";
+import { getFavoriteGameIds } from "@/lib/auth";
 import ThreeColumnLayout from "@/components/layout/ThreeColumnLayout";
 import TodaysBanner from "@/components/game/TodaysBanner";
 import GenreRow from "@/components/game/GenreRow";
@@ -71,6 +72,7 @@ async function getHomeData() {
 
 export default async function Home() {
   const { genres, todayGames, leftAds, rightAds } = await getHomeData();
+  const favoriteGameIds = await getFavoriteGameIds();
 
   return (
     <ThreeColumnLayout leftAds={leftAds} rightAds={rightAds}>
@@ -80,6 +82,7 @@ export default async function Home() {
           key={genre.id}
           genre={{ name: genre.name, slug: genre.slug }}
           games={genre.games}
+          favoriteGameIds={favoriteGameIds}
         />
       ))}
     </ThreeColumnLayout>

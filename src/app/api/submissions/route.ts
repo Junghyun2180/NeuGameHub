@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
+import { isValidGameUrl } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -9,6 +11,13 @@ export async function POST(request: NextRequest) {
     if (!title || !description || !gameUrl || !genreName || !aiToolName || !submitterName || !submitterEmail) {
       return NextResponse.json(
         { error: "모든 필드를 입력해주세요" },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidGameUrl(gameUrl)) {
+      return NextResponse.json(
+        { error: "게임 URL은 https://로 시작해야 합니다" },
         { status: 400 }
       );
     }
@@ -37,11 +46,16 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
+    await requireAdmin();
+
     const submissions = await prisma.gameSubmission.findMany({
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json({ submissions });
   } catch (error) {
+    if (error instanceof Error && error.message === "관리자 권한이 필요합니다") {
+      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+    }
     console.error("Failed to get submissions:", error);
     return NextResponse.json(
       { error: "신청 목록을 불러오는데 실패했습니다" },

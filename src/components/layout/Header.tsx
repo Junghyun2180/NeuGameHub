@@ -202,6 +202,12 @@ export default async function Header() {
                         </span>
                       )}
                     </div>
+                    <Link
+                      href="/mypage"
+                      className="block px-4 py-2 text-sm text-steam-text-muted hover:text-steam-text hover:bg-steam-card-hover transition-colors"
+                    >
+                      마이페이지
+                    </Link>
                     {user.role === "admin" && (
                       <Link
                         href="/admin/submissions"

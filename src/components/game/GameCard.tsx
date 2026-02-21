@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn, formatPlayerCount } from "@/lib/utils";
 import RatingStars from "./RatingStars";
+import FavoriteButton from "./FavoriteButton";
 
 interface GameCardProps {
   game: {
@@ -12,6 +13,7 @@ interface GameCardProps {
     genre: { name: string };
     aiTool: { name: string };
   };
+  favoriteGameIds?: string[];
 }
 
 const GENRE_COLORS: Record<string, string> = {
@@ -46,9 +48,10 @@ function getPlaceholderGradient(title: string): string {
   return PLACEHOLDER_COLORS[Math.abs(hash) % PLACEHOLDER_COLORS.length];
 }
 
-export default function GameCard({ game }: GameCardProps) {
+export default function GameCard({ game, favoriteGameIds }: GameCardProps) {
   const genreColor = GENRE_COLORS[game.genre.name] || "bg-steam-card-hover";
   const gradient = getPlaceholderGradient(game.title);
+  const isFavorite = favoriteGameIds?.includes(game.id) ?? false;
 
   return (
     <Link
@@ -67,6 +70,10 @@ export default function GameCard({ game }: GameCardProps) {
         </span>
         {/* Overlay gradient on hover */}
         <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors duration-200" />
+        {/* Favorite button */}
+        <div className="absolute top-2 right-2 z-10">
+          <FavoriteButton gameId={game.id} initialFavorite={isFavorite} size="sm" />
+        </div>
       </div>
 
       {/* Card Info */}
