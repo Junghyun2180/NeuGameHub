@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +30,9 @@ export default function LoginPage() {
 
       if (!res.ok) {
         setError(data.error || "로그인에 실패했습니다");
+        if (data.needsVerification) {
+          setNeedsVerification(true);
+        }
         return;
       }
 
@@ -57,6 +62,31 @@ export default function LoginPage() {
           {error && (
             <div className="p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm">
               {error}
+              {needsVerification && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setResending(true);
+                    try {
+                      await fetch("/api/auth/resend-verification", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email }),
+                      });
+                      setError("인증 메일을 다시 발송했습니다. 이메일을 확인해주세요.");
+                      setNeedsVerification(false);
+                    } catch {
+                      // ignore
+                    } finally {
+                      setResending(false);
+                    }
+                  }}
+                  disabled={resending}
+                  className="block mt-2 text-steam-blue hover:text-steam-highlight text-xs underline disabled:opacity-50"
+                >
+                  {resending ? "발송 중..." : "인증 메일 다시 보내기"}
+                </button>
+              )}
             </div>
           )}
 

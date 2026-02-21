@@ -8,6 +8,7 @@ AI로 만든 게임들을 모아놓은 Steam 스타일 게임 허브 플랫폼.
 - Tailwind CSS 4 (Steam 다크 테마)
 - Prisma 6 + SQLite, bcryptjs
 - 쿠키 기반 세션 인증 (httpOnly, SameSite=strict)
+- Resend (이메일 인증)
 
 ## 개발 명령어
 
@@ -26,6 +27,24 @@ npm run db:generate  # Prisma 클라이언트 재생성
 - URL 검증: `isValidGameUrl()` — https:// 만 허용
 - 시드: `POST /api/seed` (개발 환경 전용)
 - 관리자: admin@neugamehub.com / admin123
+
+## 이메일 인증 시스템
+
+- 회원가입 시 세션 대신 인증 이메일 발송 (`src/lib/email.ts`)
+- Resend API 사용, `.env`에 `RESEND_API_KEY` 필수
+- 인증 플로우: 가입 → 이메일 발송 → `/verify?token=...` → 인증 완료 → 로그인 가능
+- 로그인 시 `emailVerified` 체크, 미인증 시 재발송 버튼 제공
+- 관련 API: `/api/auth/verify`, `/api/auth/resend-verification`
+- `VerificationToken` 모델: 24시간 만료, 재발송 시 기존 토큰 삭제
+
+## 환경변수 (.env)
+
+```
+DATABASE_URL="file:./dev.db"
+RESEND_API_KEY=""                              # resend.com에서 발급
+NEXT_PUBLIC_APP_URL="http://localhost:7000"     # 인증 이메일 링크용
+FROM_EMAIL="NeuGameHub <onboarding@resend.dev>" # 무료 티어 고정
+```
 
 ## 주의사항
 

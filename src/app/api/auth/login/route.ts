@@ -31,6 +31,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 이메일 인증 확인
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        { error: "이메일 인증이 필요합니다. 가입 시 받은 인증 메일을 확인해주세요.", needsVerification: true, email: user.email },
+        { status: 403 }
+      );
+    }
+
     await createSession(user.id);
 
     return NextResponse.json({

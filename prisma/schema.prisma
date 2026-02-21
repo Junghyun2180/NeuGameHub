@@ -84,15 +84,24 @@ model Ad {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  username  String    @unique
-  password  String
-  role      String    @default("user") // "user" | "admin"
-  sessions  Session[]
-  favorites Favorite[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  password      String
+  role          String    @default("user") // "user" | "admin"
+  emailVerified Boolean   @default(false)
+  sessions      Session[]
+  favorites     Favorite[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Session {

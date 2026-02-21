@@ -8,6 +8,7 @@ export async function POST() {
   }
 
   // Clear existing data
+  await prisma.verificationToken.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
   await prisma.todaySelection.deleteMany();
@@ -26,6 +27,7 @@ export async function POST() {
       username: "admin",
       password: adminPassword,
       role: "admin",
+      emailVerified: true,
     },
   });
 
