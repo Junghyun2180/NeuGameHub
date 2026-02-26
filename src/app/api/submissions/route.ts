@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     if (!isValidGameUrl(gameUrl)) {
       return NextResponse.json(
-        { error: "게임 URL은 https://로 시작해야 합니다" },
+        { error: "게임 URL은 /local-games/게임명/index.html 형식이어야 합니다" },
         { status: 400 }
       );
     }

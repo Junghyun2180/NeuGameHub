@@ -14,7 +14,9 @@ export async function POST() {
   await prisma.todaySelection.deleteMany();
   await prisma.dailyGameStats.deleteMany();
   await prisma.rating.deleteMany();
+  await prisma.favorite.deleteMany();
   await prisma.game.deleteMany();
+  await prisma.gameSubmission.deleteMany();
   await prisma.genre.deleteMany();
   await prisma.aiTool.deleteMany();
   await prisma.ad.deleteMany();

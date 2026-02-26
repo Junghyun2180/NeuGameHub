@@ -55,7 +55,7 @@ export async function PATCH(
 
       if (!isValidGameUrl(submission.gameUrl)) {
         return NextResponse.json(
-          { error: "게임 URL이 유효하지 않습니다 (https:// 필수)" },
+          { error: "게임 URL은 /local-games/게임명/index.html 형식이어야 합니다" },
           { status: 400 }
         );
       }

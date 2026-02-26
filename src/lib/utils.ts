@@ -14,12 +14,9 @@ export function formatPlayerCount(count: number): string {
 }
 
 export function isValidGameUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
+  // 로컬 게임 경로만 허용: /local-games/로 시작, 경로 트래버설 차단
+  if (!url.startsWith("/local-games/")) return false;
+  return !url.includes("..") && /^\/local-games\/[\w-]+\/[\w\-./]+$/.test(url);
 }
 
 export function getSessionId(): string {

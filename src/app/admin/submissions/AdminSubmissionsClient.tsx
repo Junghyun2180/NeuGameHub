@@ -24,6 +24,7 @@ export default function AdminSubmissionsClient() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState<Record<string, string>>({});
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const fetchSubmissions = useCallback(async () => {
     setLoading(true);
@@ -43,16 +44,21 @@ export default function AdminSubmissionsClient() {
 
   const handleAction = async (id: string, action: "approve" | "reject") => {
     setProcessingId(id);
+    setActionError(null);
     try {
       const res = await fetch(`/api/admin/submissions/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, adminNote: noteInput[id] || "" }),
       });
+      const data = await res.json();
       if (res.ok) {
         fetchSubmissions();
+      } else {
+        setActionError(data.error || "처리에 실패했습니다");
       }
     } catch {
+      setActionError("네트워크 오류가 발생했습니다");
     } finally {
       setProcessingId(null);
     }
@@ -82,6 +88,14 @@ export default function AdminSubmissionsClient() {
 
   return (
     <>
+      {/* Action Error */}
+      {actionError && (
+        <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm flex justify-between items-center">
+          <span>⚠ {actionError}</span>
+          <button onClick={() => setActionError(null)} className="text-red-400 hover:text-red-200 ml-4">✕</button>
+        </div>
+      )}
+
       {/* Filter Tabs */}
       <div className="flex gap-1 mb-6 bg-steam-card rounded-lg border border-steam-border p-1 w-fit">
         {(["pending", "approved", "rejected", "all"] as const).map((f) => (

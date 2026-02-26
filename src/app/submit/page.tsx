@@ -98,15 +98,15 @@ export default function SubmitGamePage() {
             게임 URL <span className="text-red-400">*</span>
           </label>
           <input
-            type="url"
+            type="text"
             required
             value={form.gameUrl}
             onChange={(e) => setForm({ ...form, gameUrl: e.target.value })}
-            placeholder="https://example.com/game"
+            placeholder="/local-games/게임명/index.html"
             className={inputClass}
           />
           <p className="text-xs text-steam-text-muted mt-1">
-            iframe으로 임베드 가능한 URL을 입력해주세요
+            게임 파일을 <code className="text-steam-blue">game-files/게임명/</code> 폴더에 넣고 경로를 입력하세요
           </p>
         </div>
 
