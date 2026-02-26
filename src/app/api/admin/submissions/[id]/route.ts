@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
-import { isValidGameUrl } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
+import { rename, rm } from "fs/promises";
+import { join } from "path";
+
+const GAMES_DIR = join(process.cwd(), "game-files");
 
 export async function PATCH(
   request: NextRequest,
@@ -26,11 +29,26 @@ export async function PATCH(
       return NextResponse.json({ error: "신청을 찾을 수 없습니다" }, { status: 404 });
     }
 
+    // gameUrl에서 pendingId 추출: /local-games/pending/{pendingId}/index.html
+    const urlParts = submission.gameUrl.split("/");
+    // ["", "local-games", "pending", pendingId, "index.html"]
+    const pendingId = urlParts[3];
+    const pendingDir = join(GAMES_DIR, "pending", pendingId);
+
     if (action === "approve") {
-      // Find or create genre
-      let genre = await prisma.genre.findFirst({
-        where: { name: submission.genreName },
-      });
+      // pending → 최종 디렉토리로 이동 (submission.id 사용)
+      const finalDir = join(GAMES_DIR, id);
+      try {
+        await rename(pendingDir, finalDir);
+      } catch {
+        return NextResponse.json(
+          { error: "게임 파일을 찾을 수 없습니다. 파일이 올바르게 업로드되었는지 확인하세요." },
+          { status: 400 }
+        );
+      }
+
+      // 장르 찾기 또는 생성
+      let genre = await prisma.genre.findFirst({ where: { name: submission.genreName } });
       if (!genre) {
         genre = await prisma.genre.create({
           data: {
@@ -40,10 +58,8 @@ export async function PATCH(
         });
       }
 
-      // Find or create AI tool
-      let aiTool = await prisma.aiTool.findFirst({
-        where: { name: submission.aiToolName },
-      });
+      // AI 도구 찾기 또는 생성
+      let aiTool = await prisma.aiTool.findFirst({ where: { name: submission.aiToolName } });
       if (!aiTool) {
         aiTool = await prisma.aiTool.create({
           data: {
@@ -53,35 +69,33 @@ export async function PATCH(
         });
       }
 
-      if (!isValidGameUrl(submission.gameUrl)) {
-        return NextResponse.json(
-          { error: "게임 URL은 /local-games/게임명/index.html 형식이어야 합니다" },
-          { status: 400 }
-        );
-      }
+      // 최종 게임 URL (submission.id 기반)
+      const finalGameUrl = `/local-games/${id}/index.html`;
 
-      // Create the game
+      // Game 레코드 생성
       await prisma.game.create({
         data: {
           title: submission.title,
           description: submission.description,
           thumbnail: "",
-          gameUrl: submission.gameUrl,
+          gameUrl: finalGameUrl,
           genreId: genre.id,
           aiToolId: aiTool.id,
         },
       });
 
-      // Update submission status
+      // 신청 상태 업데이트 (gameUrl도 최종 URL로 업데이트)
       await prisma.gameSubmission.update({
         where: { id },
-        data: { status: "approved", adminNote },
+        data: { status: "approved", adminNote, gameUrl: finalGameUrl },
       });
 
       return NextResponse.json({ message: "게임이 승인되어 등록되었습니다" });
     }
 
-    // Reject
+    // 거절: pending 파일 삭제
+    await rm(pendingDir, { recursive: true, force: true });
+
     await prisma.gameSubmission.update({
       where: { id },
       data: { status: "rejected", adminNote },
@@ -93,9 +107,6 @@ export async function PATCH(
       return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
     }
     console.error("Failed to process submission:", error);
-    return NextResponse.json(
-      { error: "처리에 실패했습니다" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "처리에 실패했습니다" }, { status: 500 });
   }
 }

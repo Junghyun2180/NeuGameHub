@@ -51,9 +51,12 @@ export async function GET(
         "Content-Security-Policy": [
           "default-src 'self' blob: data:",
           "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:",
-          "style-src 'self' 'unsafe-inline'",
-          "img-src 'self' data: blob:",
-          "media-src 'self' blob: data:",
+          "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
+          "img-src * data: blob:",
+          "media-src * blob: data:",
+          "font-src * data:",
+          // 게임 서버(멀티플레이어, 리더보드 등) 연결 허용
+          "connect-src * ws: wss:",
           "frame-ancestors 'self'",
         ].join("; "),
       },
